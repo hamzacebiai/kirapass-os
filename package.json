@@ -2,23 +2,14 @@
   "name": "kirapass-os",
   "version": "1.0.0",
   "private": true,
-  "description": "AI-powered property management platform",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "main": "index.js",
+  "description": "KiraPass OS — PropTech SaaS AI Operating System",
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "echo \"dev will be configured in Phase 2\"",
-    "build": "echo \"build will be configured in Phase 2\"",
-    "test": "echo \"No tests yet\""
+    "dev": "npm run dev --workspace=apps/api",
+    "build": "npm run build --workspace=apps/api",
+    "db:generate": "npm run generate --workspace=packages/database",
+    "db:migrate": "npm run migrate --workspace=packages/database"
   },
-  "keywords": [
-    "saas",
-    "proptech",
-    "ai",
-    "kirapass"
-  ],
   "author": "Atalay Hamzaçebi",
   "license": "MIT"
 }
