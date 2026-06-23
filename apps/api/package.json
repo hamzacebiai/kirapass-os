@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "ts-node src/server/index.ts",
     "build": "tsc",
-    "start": "node dist/server/index.js"
+    "start": "node dist/server/index.js",
+    "lint": "eslint .",
+    "lint:arch": "eslint \"src/modules/**/{service,controller,routes}.ts\" \"src/routes/index.ts\""
   },
   "dependencies": {
     "express": "^5.2.1"
@@ -14,7 +16,9 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.0.0",
+    "eslint": "^9.16.0",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.18.0"
   }
 }

@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "description": "AI-powered property management platform",
-  "type": "module",
   "workspaces": [
     "apps/*",
     "packages/*"
