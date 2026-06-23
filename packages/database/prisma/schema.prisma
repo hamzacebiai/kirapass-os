@@ -13,10 +13,12 @@ model Agency {
   slug      String   @unique
   email     String   @unique
   phone     String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users     User[]
+  isActive         Boolean          @default(true)
+  subscriptionTier SubscriptionTier @default(BASIC)
+  status           AgencyStatus     @default(ACTIVE)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  users            User[]
 
   @@map("agencies")
 }
@@ -52,6 +54,19 @@ model RefreshToken {
 enum UserRole {
   SUPER_ADMIN
   AGENCY_OWNER
+  AGENCY_STAFF
   AGENT
   VIEWER
+  SYSTEM_ADMIN
+}
+
+enum SubscriptionTier {
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum AgencyStatus {
+  ACTIVE
+  SUSPENDED
 }
