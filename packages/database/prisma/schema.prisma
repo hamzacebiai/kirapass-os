@@ -19,6 +19,7 @@ model Agency {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   users            User[]
+  properties       Property[]
 
   @@map("agencies")
 }
@@ -49,6 +50,70 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
+}
+
+model Property {
+  id         String         @id @default(uuid())
+  agencyId   String
+  title      String
+  addressLine String
+  city       String
+  district   String?
+  postalCode String?
+  notes      String?
+  type       PropertyType   @default(RESIDENTIAL)
+  status     PropertyStatus @default(ACTIVE)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  agency     Agency         @relation(fields: [agencyId], references: [id])
+  units      Unit[]
+
+  @@index([agencyId])
+  @@map("properties")
+}
+
+model Unit {
+  id         String     @id @default(uuid())
+  agencyId   String
+  propertyId String
+  name       String
+  unitNumber String
+  floor      String?
+  notes      String?
+  type       UnitType   @default(APARTMENT)
+  status     UnitStatus @default(ACTIVE)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  property   Property   @relation(fields: [propertyId], references: [id])
+
+  @@index([agencyId])
+  @@index([propertyId])
+  @@map("units")
+}
+
+enum UnitType {
+  APARTMENT
+  OFFICE
+  SHOP
+  WAREHOUSE
+  LAND
+  OTHER
+}
+
+enum UnitStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+  LAND
+}
+
+enum PropertyStatus {
+  ACTIVE
+  ARCHIVED
 }
 
 enum UserRole {

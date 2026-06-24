@@ -4,12 +4,16 @@ import { PrismaClient, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { RegisterAgencyDto } from './dto/register-agency.dto';
 import { LoginDto } from './dto/login.dto';
+import { AuditService } from '../../common/audit/audit.service';
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private audit: AuditService,
+  ) {}
 
   async registerAgency(dto: RegisterAgencyDto) {
     const existingAgency = await prisma.agency.findUnique({
@@ -50,6 +54,15 @@ export class AuthService {
     const owner = agency.users[0];
     const token = this.generateToken(owner.id, owner.agencyId, owner.role);
 
+    void this.audit.log({
+      eventType: 'auth.register.success',
+      action: 'register',
+      resource: 'agency',
+      userId: owner.id,
+      agencyId: agency.id,
+      metadata: { slug: agency.slug, email: owner.email },
+    });
+
     return {
       message: 'Agency registered successfully',
       token,
@@ -75,15 +88,38 @@ export class AuthService {
     });
 
     if (!user || !user.isActive) {
+      void this.audit.log({
+        eventType: 'auth.login.failed',
+        action: 'login',
+        resource: 'auth',
+        metadata: { email: dto.email, reason: 'unknown_or_inactive' },
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!passwordValid) {
+      void this.audit.log({
+        eventType: 'auth.login.failed',
+        action: 'login',
+        resource: 'auth',
+        userId: user.id,
+        agencyId: user.agencyId,
+        metadata: { email: dto.email, reason: 'bad_password' },
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const token = this.generateToken(user.id, user.agencyId, user.role);
+
+    void this.audit.log({
+      eventType: 'auth.login.success',
+      action: 'login',
+      resource: 'auth',
+      userId: user.id,
+      agencyId: user.agencyId,
+      metadata: { email: user.email },
+    });
 
     return {
       token,
