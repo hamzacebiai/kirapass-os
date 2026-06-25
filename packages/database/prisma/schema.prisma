@@ -166,6 +166,25 @@ model Payment {
   @@map("payments")
 }
 
+model AuditLog {
+  id            String   @id @default(uuid())
+  eventType     String
+  action        String
+  resource      String
+  method        String?
+  statusCode    Int?
+  userId        String?
+  agencyId      String?
+  correlationId String?
+  ip            String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([agencyId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
 enum PaymentMethod {
   CASH
   BANK_TRANSFER

@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { GlobalExceptionFilter } from './common/errors/global-exception.filter';
 import { LifecycleService } from './common/production/lifecycle.service';
@@ -14,6 +14,7 @@ import { RentScheduleModule } from './modules/rent-schedule/rent-schedule.module
 import { PaymentModule } from './modules/payment/payment.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuditModule } from './common/audit/audit.module';
+import { AuditInterceptor } from './common/audit/audit.interceptor';
 import { RateLimitModule } from './common/rate-limit/rate-limit.module';
 import { ObservabilityModule } from './common/observability/observability.module';
 import { CorrelationMiddleware } from './common/observability/correlation.middleware';
@@ -46,6 +47,7 @@ import { MetricsModule } from './common/metrics/metrics.module';
   ],
   providers: [
     { provide: APP_FILTER, useClass: GlobalExceptionFilter },
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
     LifecycleService,
   ],
 })

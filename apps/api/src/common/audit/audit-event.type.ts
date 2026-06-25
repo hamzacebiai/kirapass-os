@@ -5,7 +5,8 @@ export type AuditEventType =
   | 'auth.register.success'
   | 'auth.rbac.denied'
   | 'auth.rate_limited'
-  | 'tenant.access';
+  | 'tenant.access'
+  | 'domain.mutation';
 
 export interface AuditEvent {
   eventType: AuditEventType;
@@ -16,5 +17,8 @@ export interface AuditEvent {
   metadata?: Record<string, any>;
   ip?: string;
   userAgent?: string;
+  method?: string;
+  statusCode?: number;
+  correlationId?: string;
   timestamp?: string;
 }
