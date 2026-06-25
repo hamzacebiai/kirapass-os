@@ -8,6 +8,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { PropertyModule } from './modules/property/property.module';
 import { UnitModule } from './modules/unit/unit.module';
+import { LeaseModule } from './modules/lease/lease.module';
+import { TenantModule } from './modules/tenant/tenant.module';
+import { RentScheduleModule } from './modules/rent-schedule/rent-schedule.module';
+import { PaymentModule } from './modules/payment/payment.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuditModule } from './common/audit/audit.module';
 import { RateLimitModule } from './common/rate-limit/rate-limit.module';
@@ -35,6 +39,10 @@ import { MetricsModule } from './common/metrics/metrics.module';
     UsersModule,
     PropertyModule,
     UnitModule,
+    LeaseModule,
+    TenantModule,
+    RentScheduleModule,
+    PaymentModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: GlobalExceptionFilter },

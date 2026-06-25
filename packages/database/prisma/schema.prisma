@@ -20,6 +20,7 @@ model Agency {
   updatedAt        DateTime         @updatedAt
   users            User[]
   properties       Property[]
+  tenants          Tenant[]
 
   @@map("agencies")
 }
@@ -85,10 +86,129 @@ model Unit {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   property   Property   @relation(fields: [propertyId], references: [id])
+  leases     Lease[]
 
   @@index([agencyId])
   @@index([propertyId])
   @@map("units")
+}
+
+model Lease {
+  id            String      @id @default(uuid())
+  agencyId      String
+  unitId        String
+  startDate     DateTime
+  endDate       DateTime
+  rentAmount    Decimal     @db.Decimal(12, 2)
+  depositAmount Decimal?    @db.Decimal(12, 2)
+  notes         String?
+  status        LeaseStatus @default(ACTIVE)
+  tenantId      String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  unit          Unit           @relation(fields: [unitId], references: [id])
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  rentSchedules RentSchedule[]
+
+  @@index([agencyId])
+  @@index([unitId])
+  @@index([tenantId])
+  @@map("leases")
+}
+
+model RentSchedule {
+  id        String             @id @default(uuid())
+  agencyId  String
+  leaseId   String
+  tenantId  String?
+  dueDate   DateTime
+  amount    Decimal            @db.Decimal(12, 2)
+  status    RentScheduleStatus @default(PENDING)
+  notes     String?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  lease     Lease              @relation(fields: [leaseId], references: [id])
+  tenant    Tenant?            @relation(fields: [tenantId], references: [id])
+  payments  Payment[]
+
+  @@index([agencyId])
+  @@index([leaseId])
+  @@index([tenantId])
+  @@map("rent_schedules")
+}
+
+enum RentScheduleStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  agencyId       String
+  rentScheduleId String
+  tenantId       String?
+  amount         Decimal       @db.Decimal(12, 2)
+  paidAt         DateTime
+  method         PaymentMethod @default(CASH)
+  reference      String?
+  status         PaymentStatus @default(COMPLETED)
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  rentSchedule   RentSchedule  @relation(fields: [rentScheduleId], references: [id])
+  tenant         Tenant?       @relation(fields: [tenantId], references: [id])
+
+  @@index([agencyId])
+  @@index([rentScheduleId])
+  @@index([tenantId])
+  @@map("payments")
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CARD
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  REFUNDED
+  VOIDED
+}
+
+model Tenant {
+  id         String       @id @default(uuid())
+  agencyId   String
+  firstName  String
+  lastName   String
+  email      String?
+  phone      String?
+  nationalId String?
+  notes      String?
+  status     TenantStatus @default(ACTIVE)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  agency        Agency         @relation(fields: [agencyId], references: [id])
+  leases        Lease[]
+  rentSchedules RentSchedule[]
+  payments      Payment[]
+
+  @@index([agencyId])
+  @@map("tenants")
+}
+
+enum TenantStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum LeaseStatus {
+  ACTIVE
+  ARCHIVED
 }
 
 enum UnitType {
