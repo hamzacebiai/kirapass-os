@@ -43,8 +43,18 @@ export class UnitService {
   }
 
   // Auto-scoped (findMany) by tenant middleware; SYSTEM_ADMIN sees all.
-  list() {
-    return this.prisma.unit.findMany({ orderBy: { createdAt: 'desc' } });
+  // Paginated (default 50, max 100). Excludes ARCHIVED unless includeArchived.
+  list(page?: string, pageSize?: string, includeArchived?: string) {
+    const take = Math.min(Math.max(parseInt(pageSize ?? '', 10) || 50, 1), 100);
+    const skip = (Math.max(parseInt(page ?? '', 10) || 1, 1) - 1) * take;
+    const where =
+      includeArchived === 'true' ? {} : { status: { not: 'ARCHIVED' as const } };
+    return this.prisma.unit.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take,
+    });
   }
 
   // Single-record op: explicit TWO-level ownership — unit.agencyId AND

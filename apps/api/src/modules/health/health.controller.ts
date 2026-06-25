@@ -1,6 +1,7 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { TenantPrismaService } from '../../common/prisma/tenant-prisma.service';
+import { DiagnosticsGuard } from '../../common/security/diagnostics.guard';
 
 @Controller('health')
 export class HealthController {
@@ -40,8 +41,9 @@ export class HealthController {
       .json({ status: db ? 'ok' : 'degraded', check: 'readiness', db });
   }
 
-  // Diagnostics: version / uptime / memory / env (no secrets).
+  // Diagnostics: version / uptime / memory / env (no secrets). Prod-gated.
   @Get('info')
+  @UseGuards(DiagnosticsGuard)
   info() {
     const mem = process.memoryUsage();
     const mb = (n: number) => Math.round((n / 1048576) * 100) / 100;

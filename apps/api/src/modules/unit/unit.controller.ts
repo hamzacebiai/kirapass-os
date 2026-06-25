@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UnitService } from './unit.service';
@@ -28,8 +29,12 @@ export class UnitController {
 
   @Get()
   @Permissions(Permission.UnitRead)
-  list() {
-    return this.units.list();
+  list(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('includeArchived') includeArchived?: string,
+  ) {
+    return this.units.list(page, pageSize, includeArchived);
   }
 
   @Get(':id')

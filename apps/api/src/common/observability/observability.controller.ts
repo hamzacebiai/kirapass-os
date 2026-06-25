@@ -1,7 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { getCorrelationId } from './request-context-ext';
+import { DiagnosticsGuard } from '../security/diagnostics.guard';
 
 @Controller('observability')
+@UseGuards(DiagnosticsGuard)
 export class ObservabilityController {
   @Get('ping')
   ping() {

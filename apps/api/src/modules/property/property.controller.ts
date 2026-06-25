@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PropertyService } from './property.service';
@@ -28,8 +29,12 @@ export class PropertyController {
 
   @Get()
   @Permissions(Permission.PropertyRead)
-  list() {
-    return this.properties.list();
+  list(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('includeArchived') includeArchived?: string,
+  ) {
+    return this.properties.list(page, pageSize, includeArchived);
   }
 
   @Get(':id')
