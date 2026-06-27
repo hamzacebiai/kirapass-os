@@ -1,3 +1,10 @@
+# KIRA OS BOOTSTRAP
+# Her oturumda sırayla oku:
+# 1. docs/constitution/README.md  (Layer 1-3: project · engineering · execution)
+# 2. docs/02_ACTIVE_SPRINT.md      (aktif iş)
+# 3. docs/05_PRODUCTION_GATES.md   (gate durumu)
+# Bu blok proje yasası değil, execution bootstrap'tir. Aşağısı charter'dır.
+
 # CLAUDE.md — KiraPass OS Master Operating Charter
 
 Source of truth. **Read this before every task.** Senior full-stack +

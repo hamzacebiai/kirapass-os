@@ -1,22 +1,28 @@
-# 05 — Production Launch Gates
-_Public-launch checklist. Status as of 2026-06-25. All gates additive._
+# 05 — Production Gates (Evidence Log)
+_Son güncelleme: 2026-06-27. Branch: checkpoint/p0-1-hardening._
 
-| Gate | Requirement | Current | Status | Smallest fix |
-|---|---|---|---|---|
-| JWT | Strong secret; fail-fast if missing/default in prod | secret len 29, default pattern; validateEnv log-only | FAIL | exit on missing/default secret in prod |
-| CORS | Origin allowlist, no wildcard | `enableCors()` wildcard | FAIL | env-driven origin allowlist |
-| Docker | Deployable API image | no Dockerfile; compose has Postgres only | FAIL | multi-stage Dockerfile for dist/main.js |
-| Backup | Scheduled backup + tested restore | none (volume only) | FAIL | pg_dump cron + restore runbook |
-| Audit Persistence | Domain mutations audited + persisted | console-only, domains uncovered | FAIL | global audit interceptor + AuditLog table |
-| Token Revocation | Refresh/logout invalidates tokens | 7d token, RefreshToken table unused | FAIL | refresh/logout via existing table, shorter TTL |
+| Gate | Açıklama | Durum | Commit / Kanıt |
+|------|----------|-------|----------------|
+| G1 | JWT fail-fast (strong secret, prod exit) | ✅ PASS | 9a53abb · main.ts:18-28 + env-validation.ts (hasWeakJwtSecret) |
+| G2 | CORS allowlist (no wildcard) | ✅ PASS | 9a53abb · main.ts CORS_ORIGINS / origin:false |
+| G3 | Docker (multi-stage node:22-slim) | ✅ PASS | Dockerfile + .dockerignore; container /health 200, /ready db:true |
+| G4 | Backup + restore (tested roundtrip) | ✅ PASS | scripts/backup.ps1 + restore.ps1; backups/*.dump |
+| G5 | Audit Persistence (interceptor + table) | ✅ PASS | d39123d · audit.interceptor.ts; migration 20260625205821_add_audit_log |
+| G6 | Token Revocation (refresh rotation + logout) | ✅ PASS | e4a3c58 · auth.service refresh/logout; migration 20260625215231_add_refresh_token_rotation |
 
-## Supporting (non-gating but recommended before scale)
-- Strong Postgres password (remove default).
-- Composite indexes (agencyId,status) / (agencyId,createdAt).
-- Prisma $disconnect on shutdown; AuthService via DI Prisma.
-- CI + automated tests + ESLint.
+**Skor: 6/6 PASS.** P0-1 Production Hardening tamamlandı.
 
-## Gate Decision
-Public Production Launch: **NO-GO** until JWT, CORS, Docker, Backup gates pass
-(Audit Persistence + Token Revocation strongly recommended in the same sprint).
-Domain Expansion: **GO** (independent of these gates).
+## Doğrulama (runtime, bu oturumda)
+- Build (tsc + nest) = 0; migrations in sync (10 migration).
+- G1: prod missing/weak secret → exit 1; strong → boot.
+- G2: allowed origin → ACAO; foreign → none; prod-unset → asla `*`.
+- G3: image build 0, container boot, /health 200.
+- G4: backup → 33KB dump; restore → tablo+satır eşleşti.
+- G5: mutasyon → audit_logs satırı (agency/user); GET hariç.
+- G6: login→refresh→rotate; revoked/reused→401; logout→401.
+
+## Sonraki gate
+**G7 — Test Coverage** (P0-3): jest + ≥1 spec/domain + build PASS. Status: ❌ OPEN.
+
+## Launch kararı
+Public launch için ops bağımlılıkları kalan: prod env (strong JWT_SECRET, DIAGNOSTICS_TOKEN, CORS_ORIGINS), Postgres default şifre rotasyonu, CI/CD, test runner. Kod gate'leri (G1–G6) kapalı.

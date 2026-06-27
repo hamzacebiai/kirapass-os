@@ -22,6 +22,7 @@ import { RequestTimingMiddleware } from './common/observability/request-timing.m
 import { TenantContextMiddleware } from './common/tenant-context.middleware';
 import { SecurityModule } from './common/security/security.module';
 import { MetricsModule } from './common/metrics/metrics.module';
+import { IncidentModule } from './common/incident/incident.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MetricsModule } from './common/metrics/metrics.module';
     }),
     SecurityModule,
     MetricsModule,
+    IncidentModule,
     ObservabilityModule,
     AuditModule,
     RateLimitModule,
