@@ -3,7 +3,15 @@ import { PrismaClient } from '@prisma/client';
 import { getRequestContext } from '../request-context';
 
 // Models that carry agencyId and must be tenant-scoped.
-const TENANT_MODELS = new Set<string>(['User', 'Property', 'Unit']);
+const TENANT_MODELS = new Set<string>([
+  'User',
+  'Property',
+  'Unit',
+  'Lease',
+  'Tenant',
+  'RentSchedule',
+  'Payment',
+]);
 // Filter-based actions safe to auto-scope (single update/delete target unique
 // ids and are left to explicit checks to avoid where-uniqueness conflicts).
 const SCOPED_ACTIONS = new Set<string>([

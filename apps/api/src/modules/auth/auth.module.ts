@@ -15,7 +15,9 @@ import { PermissionsGuard } from './guards/permissions.guard';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN', '7d') },
+        signOptions: {
+          expiresIn: configService.get('JWT_ACCESS_EXPIRES_IN', '15m'),
+        },
       }),
       inject: [ConfigService],
     }),

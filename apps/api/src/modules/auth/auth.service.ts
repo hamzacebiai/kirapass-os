@@ -2,6 +2,7 @@ import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClient, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { createHash, randomBytes } from 'node:crypto';
 import { RegisterAgencyDto } from './dto/register-agency.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuditService } from '../../common/audit/audit.service';
@@ -52,7 +53,11 @@ export class AuthService {
     });
 
     const owner = agency.users[0];
-    const token = this.generateToken(owner.id, owner.agencyId, owner.role);
+    const { token, refreshToken } = await this.issueTokens(
+      owner.id,
+      owner.agencyId,
+      owner.role,
+    );
 
     void this.audit.log({
       eventType: 'auth.register.success',
@@ -66,6 +71,7 @@ export class AuthService {
     return {
       message: 'Agency registered successfully',
       token,
+      refreshToken,
       user: {
         id: owner.id,
         email: owner.email,
@@ -110,7 +116,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = this.generateToken(user.id, user.agencyId, user.role);
+    const { token, refreshToken } = await this.issueTokens(
+      user.id,
+      user.agencyId,
+      user.role,
+    );
 
     void this.audit.log({
       eventType: 'auth.login.success',
@@ -123,6 +133,7 @@ export class AuthService {
 
     return {
       token,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -140,5 +151,60 @@ export class AuthService {
 
   private generateToken(userId: string, agencyId: string, role: string) {
     return this.jwtService.sign({ sub: userId, agencyId, role });
+  }
+
+  private hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
+  }
+
+  // Issues a short-lived access JWT + an opaque refresh token (stored hashed).
+  private async issueTokens(userId: string, agencyId: string, role: string) {
+    const token = this.generateToken(userId, agencyId, role);
+    const refreshToken = randomBytes(48).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await prisma.refreshToken.create({
+      data: { token: this.hashToken(refreshToken), userId, expiresAt },
+    });
+    return { token, refreshToken };
+  }
+
+  // Validates + rotates a refresh token. Reused/revoked/expired -> rejected.
+  async refresh(refreshToken: string) {
+    const row = await prisma.refreshToken.findUnique({
+      where: { token: this.hashToken(refreshToken) },
+      include: { user: true },
+    });
+    if (!row || row.revokedAt || row.expiresAt < new Date()) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    const issued = await this.issueTokens(
+      row.user.id,
+      row.user.agencyId,
+      row.user.role,
+    );
+    const replacement = await prisma.refreshToken.findUnique({
+      where: { token: this.hashToken(issued.refreshToken) },
+    });
+    await prisma.refreshToken.update({
+      where: { id: row.id },
+      data: { revokedAt: new Date(), replacedById: replacement?.id ?? null },
+    });
+    void this.audit.log({
+      eventType: 'auth.login.success',
+      action: 'refresh',
+      resource: 'auth',
+      userId: row.user.id,
+      agencyId: row.user.agencyId,
+    });
+    return issued;
+  }
+
+  // Revokes a refresh token (logout). Access tokens expire naturally (<=15m).
+  async logout(refreshToken: string) {
+    await prisma.refreshToken.updateMany({
+      where: { token: this.hashToken(refreshToken), revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    return { message: 'Logged out' };
   }
 }
