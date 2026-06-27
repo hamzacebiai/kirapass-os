@@ -27,13 +27,15 @@ describe('DashboardService', () => {
     prisma.tenant.count.mockResolvedValue(5);
     prisma.lease.count.mockResolvedValue(4);
     prisma.rentSchedule.aggregate.mockResolvedValue({ _sum: { amount: 12000 } });
-    prisma.rentSchedule.count.mockResolvedValue(2);
+    // 1. çağrı = pending, 2. çağrı = overdue
+    prisma.rentSchedule.count.mockResolvedValueOnce(2).mockResolvedValueOnce(1);
 
     const result = await service.getSummary();
     expect(result.agency.propertyCount).toBe(3);
     expect(result.agency.activeLeaseCount).toBe(4);
     expect(result.financial.monthlyRentTotal).toBe(12000);
     expect(result.financial.pendingCount).toBe(2);
+    expect(result.financial.overdueCount).toBe(1);
     expect(result.generatedAt).toBeDefined();
   });
 

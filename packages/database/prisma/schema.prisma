@@ -231,6 +231,9 @@ enum TenantStatus {
 enum LeaseStatus {
   ACTIVE
   ARCHIVED
+  DRAFT
+  EXPIRED
+  TERMINATED
 }
 
 enum UnitType {

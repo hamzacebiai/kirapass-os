@@ -8,18 +8,29 @@ export class DashboardService {
 
   // Read-only, agency-scoped (tenant middleware count/aggregate'i otomatik scope eder).
   async getSummary(): Promise<DashboardSummaryDto> {
-    const [propertyCount, unitCount, tenantCount, activeLeaseCount, rentAgg, pendingCount] =
-      await Promise.all([
-        this.prisma.property.count({ where: { status: { not: 'ARCHIVED' as const } } }),
-        this.prisma.unit.count({ where: { status: { not: 'ARCHIVED' as const } } }),
-        this.prisma.tenant.count({ where: { status: { not: 'ARCHIVED' as const } } }),
-        this.prisma.lease.count({ where: { status: 'ACTIVE' as const } }),
-        this.prisma.rentSchedule.aggregate({
-          _sum: { amount: true },
-          where: { status: { not: 'CANCELLED' as const } },
-        }),
-        this.prisma.rentSchedule.count({ where: { status: 'PENDING' as const } }),
-      ]);
+    const [
+      propertyCount,
+      unitCount,
+      tenantCount,
+      activeLeaseCount,
+      rentAgg,
+      pendingCount,
+      overdueCount,
+    ] = await Promise.all([
+      this.prisma.property.count({ where: { status: { not: 'ARCHIVED' as const } } }),
+      this.prisma.unit.count({ where: { status: { not: 'ARCHIVED' as const } } }),
+      this.prisma.tenant.count({ where: { status: { not: 'ARCHIVED' as const } } }),
+      this.prisma.lease.count({ where: { status: 'ACTIVE' as const } }),
+      this.prisma.rentSchedule.aggregate({
+        _sum: { amount: true },
+        where: { status: { not: 'CANCELLED' as const } },
+      }),
+      this.prisma.rentSchedule.count({ where: { status: 'PENDING' as const } }),
+      // Overdue: vadesi geçmiş ve hâlâ PENDING.
+      this.prisma.rentSchedule.count({
+        where: { status: 'PENDING' as const, dueDate: { lt: new Date() } },
+      }),
+    ]);
 
     return {
       agency: { propertyCount, unitCount, tenantCount, activeLeaseCount },
@@ -27,8 +38,7 @@ export class DashboardService {
         // RentSchedule.amount Decimal'dir → number'a çevir.
         monthlyRentTotal: Number(rentAgg._sum.amount ?? 0),
         pendingCount,
-        // ASSUMPTION: ayrı OVERDUE durumu yok; finansal reconciliation (Ledger) işi.
-        overdueCount: 0,
+        overdueCount,
       },
       generatedAt: new Date().toISOString(),
     };

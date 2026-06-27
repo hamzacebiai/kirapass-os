@@ -4,12 +4,14 @@
   "scripts": {
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0"
   },
   "devDependencies": {
-    "prisma": "^5.10.0"
+    "prisma": "^5.10.0",
+    "ts-node": "^10.9.2"
   }
 }

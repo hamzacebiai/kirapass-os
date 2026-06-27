@@ -54,4 +54,22 @@ export class LeaseController {
   archive(@Param('id') id: string) {
     return this.leases.archive(id);
   }
+
+  @Patch(':id/activate')
+  @Permissions(Permission.LeaseWrite)
+  activate(@Param('id') id: string) {
+    return this.leases.activate(id);
+  }
+
+  @Patch(':id/expire')
+  @Permissions(Permission.LeaseWrite)
+  expire(@Param('id') id: string) {
+    return this.leases.expire(id);
+  }
+
+  @Patch(':id/terminate')
+  @Permissions(Permission.LeaseWrite)
+  terminate(@Param('id') id: string) {
+    return this.leases.terminate(id);
+  }
 }
