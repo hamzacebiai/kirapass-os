@@ -101,4 +101,21 @@ export class PaymentService {
       data: { status: 'VOIDED' },
     });
   }
+
+  // Basic sync: payment -> COMPLETED, ilgili rent schedule -> PAID.
+  // (PaymentStatus'ta 'PAID' yok; ödeme tamamlanması = COMPLETED.)
+  async markAsPaid(id: string) {
+    const payment = await this.getById(id);
+    const updated = await this.prisma.payment.update({
+      where: { id },
+      data: { status: 'COMPLETED' },
+    });
+    if (payment.rentScheduleId) {
+      await this.prisma.rentSchedule.update({
+        where: { id: payment.rentScheduleId },
+        data: { status: 'PAID' },
+      });
+    }
+    return updated;
+  }
 }

@@ -54,4 +54,10 @@ export class PaymentController {
   void(@Param('id') id: string) {
     return this.payments.void(id);
   }
+
+  @Patch(':id/pay')
+  @Permissions(Permission.PaymentWrite)
+  markAsPaid(@Param('id') id: string) {
+    return this.payments.markAsPaid(id);
+  }
 }

@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TenantPrismaService } from '../../common/prisma/tenant-prisma.service';
 import { getRequestContext } from '../../common/request-context';
 import { CreateLeaseDto } from './dto/create-lease.dto';
@@ -83,6 +88,40 @@ export class LeaseService {
     return this.prisma.lease.update({
       where: { id },
       data: { status: 'ARCHIVED' },
+    });
+  }
+
+  // Workflow: DRAFT -> ACTIVE -> EXPIRED ; ACTIVE|DRAFT -> TERMINATED.
+  async activate(id: string) {
+    const lease = await this.getById(id);
+    if (lease.status !== 'DRAFT') {
+      throw new BadRequestException('Only DRAFT leases can be activated');
+    }
+    return this.prisma.lease.update({
+      where: { id },
+      data: { status: 'ACTIVE' },
+    });
+  }
+
+  async expire(id: string) {
+    const lease = await this.getById(id);
+    if (lease.status !== 'ACTIVE') {
+      throw new BadRequestException('Only ACTIVE leases can be expired');
+    }
+    return this.prisma.lease.update({
+      where: { id },
+      data: { status: 'EXPIRED' },
+    });
+  }
+
+  async terminate(id: string) {
+    const lease = await this.getById(id);
+    if (!['ACTIVE', 'DRAFT'].includes(lease.status)) {
+      throw new BadRequestException('Cannot terminate this lease');
+    }
+    return this.prisma.lease.update({
+      where: { id },
+      data: { status: 'TERMINATED' },
     });
   }
 }
