@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "npm run dev --workspace=apps/api",
     "build": "npm run build --workspace=apps/api",
+    "test": "npm run test --workspace=apps/api",
+    "test:cov": "npm run test:cov --workspace=apps/api",
     "db:generate": "npm run generate --workspace=packages/database",
     "db:migrate": "npm run migrate --workspace=packages/database",
     "check:port3000": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev-safety.ps1 -Action check-port -Port 3000",
