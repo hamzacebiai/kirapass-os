@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { validateEnv } from './common/config/env-validation';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const startedAt = Date.now();
@@ -44,6 +45,19 @@ async function bootstrap() {
   } else {
     app.enableCors();
   }
+
+  // Sprint B2: Swagger API docs. Production'da kapalı (güvenlik).
+  if (process.env.NODE_ENV !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('KiraPass OS API')
+      .setDescription('PropTech SaaS API — V1')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document);
+  }
+
   app.enableShutdownHooks();
   const port = process.env.PORT ?? 3000;
   await app.listen(port);

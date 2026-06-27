@@ -38,6 +38,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/packages/database/prisma ./packages/database/prisma
 COPY --from=builder /app/package.json ./package.json
+COPY startup.sh ./startup.sh
 
 EXPOSE 3000
-CMD ["node", "apps/api/dist/main.js"]
+# startup.sh: prisma migrate deploy + node apps/api/dist/main.js
+CMD ["sh", "startup.sh"]
