@@ -23,6 +23,7 @@ import { TenantContextMiddleware } from './common/tenant-context.middleware';
 import { SecurityModule } from './common/security/security.module';
 import { MetricsModule } from './common/metrics/metrics.module';
 import { IncidentModule } from './common/incident/incident.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { IncidentModule } from './common/incident/incident.module';
     TenantModule,
     RentScheduleModule,
     PaymentModule,
+    DashboardModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: GlobalExceptionFilter },
