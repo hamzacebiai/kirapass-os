@@ -1,28 +1,26 @@
 # 02 — Active Sprint
-_Son güncelleme: 2026-06-27. Branch: checkpoint/p0-1-hardening._
-
-## MEVCUT FAZ
-**P0-3 — Test Foundation**
+_Son güncelleme: 2026-06-27._
 
 ## TAMAMLANAN FAZLAR
-- ✅ **P0-1 Production Hardening** — Gates 1-6 PASS (docs/05).
-- ✅ **P0-2 AI Engineering Foundation** — docs/constitution/ (3 katman) + CLAUDE.md bootstrap + .env.example.
+- ✅ P0-1 Production Hardening (Gates 1-6)
+- ✅ P0-2 AI Engineering Foundation (constitution + bootstrap + .env.example)
+- ✅ P0-3 Test Foundation (jest + ts-jest + ilk spec'ler)
+- ✅ P0-4 CI/CD (GitHub Actions — 1472cc4 green)
+- ✅ G7 Domain Coverage (9 suite / 23 test)
+- ✅ **P0-5 CODE COMPLETE** (ops env = deploy-time)
 
-## P0-3 KAPSAM (Test Foundation)
-- jest + @nestjs/testing + ts-jest (apps/api devDependencies) — **paket ekleme = onaylı iş**.
-- jest.config.ts + root/apps `test` script.
-- İlk spec'ler: health.controller.spec.ts, auth.service.spec.ts (login happy path).
-- Hedef: G7 Test Coverage gate → ≥1 spec/domain, build PASS.
+## MEVCUT FAZ
+**P1 — Layer 1 Feature Development** (P0_LOCKDOWN kalktı; Layer 2/3 hâlâ kilitli).
 
-## BLOKAJLAR
-- `kirapass-os/` nested repo (kendi .git'i) → commit öncesi `.gitignore`'a eklendi; içerik temizliği ayrı karar.
-- CI/CD yok → P0-4.
-- Postgres default şifre (docker-compose) → ops, launch öncesi.
+## P1 KAPSAM (öneri — seçim bekliyor)
+Layer 1 Rental Operations genişlemesi: property gelişmiş CRUD · lease workflow · payment akışı · tenant portal · dashboard API. Yeni endpoint/iş kuralı/domain olayı — additive, mevcut davranış korunur.
 
-## SONRAKİ FAZLAR
-- P0-3 Test Foundation (aktif)
-- P0-4 CI/CD (GitHub Actions)
-- P0-5 Production Launch Gate
+## TECH DEBT (kilitli değil, ayrı onay)
+- auth.service derin unit test → PrismaClient inject refactor.
+- Postgres default şifresi rotasyonu (docker-compose).
+- CI coverage report (jest --coverage + threshold).
+- Incident endpoint egress (Gemini) gizlilik/throttle gözden geçirme.
+- Nested `kirapass-os/` repo temizliği.
 
 ## NOT
-Test runner şu an YOK (kanıt: package.json'da test script yok). "Test edilmedi" ≠ "başarısız". Mevcut doğrulama = build + migration + runtime curl.
+Mevcut doğrulama = build + migration + runtime + jest + CI. "Test edilmedi" ≠ "başarısız".

@@ -21,8 +21,23 @@ _Son güncelleme: 2026-06-27. Branch: checkpoint/p0-1-hardening._
 - G5: mutasyon → audit_logs satırı (agency/user); GET hariç.
 - G6: login→refresh→rotate; revoked/reused→401; logout→401.
 
-## Sonraki gate
-**G7 — Test Coverage** (P0-3): jest + ≥1 spec/domain + build PASS. Status: ❌ OPEN.
+## G7 — Test Coverage Gate
+Kriter: ≥3 test/domain + build PASS + CI green.
+Kanıt: 9 suite / 23 test PASS (local + CI 1472cc4); domains property·unit·tenant·lease·rent-schedule·payment·users. Auth kısmi → TECH DEBT (auth.service modül-yerel PrismaClient; gerçek unit test için inject refactor gerekir).
+Status: ✅ PASS
+
+## P0-5 — Production Launch Gate
+| Madde | Durum | Kanıt |
+|---|---|---|
+| Build | ✅ PASS | CI + local nest build=0 |
+| Migration | ✅ PASS | 10 migration in sync (migrate deploy CI) |
+| CI | ✅ GREEN | 1472cc4 completed/success |
+| Coverage | ✅ PASS | 23 test / 7 domain |
+| Smoke | ✅ PASS | /health 200 + /ready db:true (Gate 3) |
+| Docker | ✅ PASS | image build 0 + container boot (Gate 3) |
+| Env | ⏳ OPS | Kod fail-fast (G1) aktif; deploy-time: JWT_SECRET≥32, DIAGNOSTICS_TOKEN, CORS_ORIGINS |
+
+**Code Complete: ✅ 2026-06-27** · Ops Deploy: ⏳ (ilk deployment).
 
 ## Launch kararı
 Public launch için ops bağımlılıkları kalan: prod env (strong JWT_SECRET, DIAGNOSTICS_TOKEN, CORS_ORIGINS), Postgres default şifre rotasyonu, CI/CD, test runner. Kod gate'leri (G1–G6) kapalı.
