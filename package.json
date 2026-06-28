@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "KiraPass OS — PropTech SaaS AI Operating System",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm run dev --workspace=apps/api",
     "build": "npm run build --workspace=apps/api",
@@ -19,5 +22,8 @@
     "prisma:safe-generate": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev-safety.ps1 -Action safe-generate"
   },
   "author": "Atalay Hamzaçebi",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.1"
+  }
 }
