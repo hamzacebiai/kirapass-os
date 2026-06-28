@@ -34,17 +34,14 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   // Gate 2: CORS allowlist. Explicit origins via CORS_ORIGINS; production with
   // no allowlist denies cross-origin (no wildcard); development unchanged.
-  const corsOrigins = (process.env.CORS_ORIGINS ?? '')
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean);
-  if (corsOrigins.length > 0) {
-    app.enableCors({ origin: corsOrigins });
-  } else if (process.env.NODE_ENV === 'production') {
-    app.enableCors({ origin: false });
-  } else {
-    app.enableCors();
-  }
+  app.enableCors({
+    origin: [
+      'http://localhost:3001',
+      'https://kirapass-web.vercel.app',
+      /\.vercel\.app$/,
+    ],
+    credentials: true,
+  });
 
   // Sprint B2: Swagger API docs. Production'da kapalı (güvenlik).
   if (process.env.NODE_ENV !== 'production') {
