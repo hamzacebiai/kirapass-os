@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  IsUUID,
   Min,
 } from 'class-validator';
 import { LeaseStatus } from '@prisma/client';
@@ -35,4 +36,8 @@ export class UpdateLeaseDto {
   @IsOptional()
   @IsEnum(LeaseStatus)
   status?: LeaseStatus;
+
+  @IsOptional()
+  @IsUUID()
+  tenantId?: string;
 }
