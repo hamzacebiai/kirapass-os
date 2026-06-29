@@ -1,4 +1,10 @@
-import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MinLength,
+} from 'class-validator';
 import { PropertyStatus, PropertyType } from '@prisma/client';
 
 // Used by Phase 3.1 (full API). Defined now per the approved plan.
@@ -37,4 +43,8 @@ export class UpdatePropertyDto {
   @IsOptional()
   @IsEnum(PropertyStatus)
   status?: PropertyStatus;
+
+  @IsOptional()
+  @IsUUID()
+  ownerId?: string;
 }
