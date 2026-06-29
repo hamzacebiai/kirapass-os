@@ -21,6 +21,7 @@ model Agency {
   users            User[]
   properties       Property[]
   tenants          Tenant[]
+  owners           Owner[]
 
   @@map("agencies")
 }
@@ -70,9 +71,12 @@ model Property {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   agency     Agency         @relation(fields: [agencyId], references: [id])
+  ownerId    String?
+  owner      Owner?         @relation(fields: [ownerId], references: [id])
   units      Unit[]
 
   @@index([agencyId])
+  @@index([ownerId])
   @@map("properties")
 }
 
@@ -224,6 +228,28 @@ model Tenant {
 }
 
 enum TenantStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model Owner {
+  id         String      @id @default(uuid())
+  agencyId   String
+  firstName  String
+  lastName   String
+  email      String?
+  phone      String?
+  status     OwnerStatus @default(ACTIVE)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  agency     Agency      @relation(fields: [agencyId], references: [id])
+  properties Property[]
+
+  @@index([agencyId])
+  @@map("owners")
+}
+
+enum OwnerStatus {
   ACTIVE
   ARCHIVED
 }

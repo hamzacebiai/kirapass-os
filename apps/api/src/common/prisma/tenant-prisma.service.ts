@@ -11,6 +11,7 @@ const TENANT_MODELS = new Set<string>([
   'Tenant',
   'RentSchedule',
   'Payment',
+  'Owner',
 ]);
 // Filter-based actions safe to auto-scope (single update/delete target unique
 // ids and are left to explicit checks to avoid where-uniqueness conflicts).
