@@ -10,6 +10,7 @@ import { PropertyModule } from './modules/property/property.module';
 import { UnitModule } from './modules/unit/unit.module';
 import { LeaseModule } from './modules/lease/lease.module';
 import { TenantModule } from './modules/tenant/tenant.module';
+import { TenantAuthModule } from './modules/tenant-auth/tenant-auth.module';
 import { OwnerModule } from './modules/owner/owner.module';
 import { RentScheduleModule } from './modules/rent-schedule/rent-schedule.module';
 import { PaymentModule } from './modules/payment/payment.module';
@@ -48,6 +49,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     UnitModule,
     LeaseModule,
     TenantModule,
+    TenantAuthModule,
     OwnerModule,
     RentScheduleModule,
     PaymentModule,

@@ -15,11 +15,15 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/authz/permissions.enum';
+import { TenantAuthService } from '../tenant-auth/tenant-auth.service';
 
 @Controller('tenants')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class TenantController {
-  constructor(private readonly tenants: TenantService) {}
+  constructor(
+    private readonly tenants: TenantService,
+    private readonly tenantAuth: TenantAuthService,
+  ) {}
 
   @Post()
   @Permissions(Permission.TenantWrite)
@@ -53,5 +57,12 @@ export class TenantController {
   @Permissions(Permission.TenantDelete)
   archive(@Param('id') id: string) {
     return this.tenants.archive(id);
+  }
+
+  // Mint a tenant-portal invite token (returned to the agency UI).
+  @Post(':id/invite')
+  @Permissions(Permission.TenantWrite)
+  invite(@Param('id') id: string) {
+    return this.tenantAuth.createInvite(id);
   }
 }

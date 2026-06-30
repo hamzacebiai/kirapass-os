@@ -216,15 +216,33 @@ model Tenant {
   nationalId String?
   notes      String?
   status     TenantStatus @default(ACTIVE)
+  passwordHash    String?
+  inviteToken     String?      @unique
+  inviteExpiresAt DateTime?
+  passwordSetAt   DateTime?
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   agency        Agency         @relation(fields: [agencyId], references: [id])
   leases        Lease[]
   rentSchedules RentSchedule[]
   payments      Payment[]
+  tenantRefreshTokens TenantRefreshToken[]
 
   @@index([agencyId])
   @@map("tenants")
+}
+
+model TenantRefreshToken {
+  id        String    @id @default(uuid())
+  tenantId  String
+  token     String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_refresh_tokens")
 }
 
 enum TenantStatus {
