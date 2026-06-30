@@ -16,6 +16,7 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuditModule } from './common/audit/audit.module';
 import { AuditInterceptor } from './common/audit/audit.interceptor';
+import { AlertingModule } from './common/alerting/alerting.module';
 import { RateLimitModule } from './common/rate-limit/rate-limit.module';
 import { ObservabilityModule } from './common/observability/observability.module';
 import { CorrelationMiddleware } from './common/observability/correlation.middleware';
@@ -34,6 +35,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     }),
     SecurityModule,
     MetricsModule,
+    AlertingModule,
     IncidentModule,
     ObservabilityModule,
     AuditModule,

@@ -8,6 +8,7 @@ import {
 import { getRequestContext } from '../request-context';
 import { sanitize } from '../observability/log-sanitizer';
 import { ErrorEnvelope } from './error-envelope';
+import { DiscordAlertService } from '../alerting/discord-alert.service';
 
 /**
  * Catches ALL exceptions, normalizes into a stable envelope, links to the
@@ -16,6 +17,8 @@ import { ErrorEnvelope } from './error-envelope';
  */
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  constructor(private readonly discordAlert: DiscordAlertService) {}
+
   catch(exception: unknown, host: ArgumentsHost): void {
     try {
       const http = host.switchToHttp();
@@ -69,6 +72,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         console.error(`[ERROR_TRACE] ${JSON.stringify(sanitize(envelope))}`);
       } catch {
         // never block on logging
+      }
+
+      // Production 5xx → fire-and-forget Discord alert (never blocks response).
+      if (statusCode >= 500) {
+        void this.discordAlert.sendErrorAlert({
+          correlationId: envelope.correlationId ?? 'unknown',
+          statusCode,
+          path: envelope.path,
+          method: envelope.method,
+          errorCode: envelope.errorCode,
+          message: envelope.message,
+          agencyId: envelope.agencyId ?? undefined,
+        });
       }
 
       if (res && !res.headersSent) {
