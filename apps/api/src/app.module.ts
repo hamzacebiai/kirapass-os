@@ -12,6 +12,7 @@ import { LeaseModule } from './modules/lease/lease.module';
 import { TenantModule } from './modules/tenant/tenant.module';
 import { TenantAuthModule } from './modules/tenant-auth/tenant-auth.module';
 import { OwnerModule } from './modules/owner/owner.module';
+import { MessagingModule } from './modules/messaging/messaging.module';
 import { RentScheduleModule } from './modules/rent-schedule/rent-schedule.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { PrismaModule } from './common/prisma/prisma.module';
@@ -51,6 +52,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     TenantModule,
     TenantAuthModule,
     OwnerModule,
+    MessagingModule,
     RentScheduleModule,
     PaymentModule,
     DashboardModule,
