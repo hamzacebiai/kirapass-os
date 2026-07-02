@@ -234,6 +234,7 @@ model Tenant {
   messageThreads      MessageThread[]
   scoreCycles         TenantScoreCycle[]
   badges              TenantBadge[]
+  publicProfile       TenantPublicProfile?
 
   @@index([agencyId])
   @@map("tenants")
@@ -421,6 +422,22 @@ model LeaseReview {
 enum ReviewerRole {
   TENANT
   AGENCY
+}
+
+model TenantPublicProfile {
+  id            String   @id @default(uuid())
+  tenantId      String   @unique
+  isPublic      Boolean  @default(false)
+  showScore     Boolean  @default(true)
+  showBadges    Boolean  @default(true)
+  showReviews   Boolean  @default(false)
+  showName      Boolean  @default(false)
+  shareableSlug String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@map("tenant_public_profiles")
 }
 
 enum TenantStatus {
