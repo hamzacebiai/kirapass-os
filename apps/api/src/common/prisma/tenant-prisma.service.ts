@@ -14,6 +14,7 @@ const TENANT_MODELS = new Set<string>([
   'Owner',
   'MessageThread',
   'TenantScoreCycle',
+  'LeaseReview',
 ]);
 // Filter-based actions safe to auto-scope (single update/delete target unique
 // ids and are left to explicit checks to avoid where-uniqueness conflicts).

@@ -119,6 +119,7 @@ model Lease {
   rentSchedules RentSchedule[]
   messageThreads MessageThread[]
   scoreCycles   TenantScoreCycle[]
+  reviews       LeaseReview[]
 
   @@index([agencyId])
   @@index([unitId])
@@ -399,6 +400,27 @@ enum ClaimStatus {
   APPROVED
   PAID
   EXPIRED
+}
+
+model LeaseReview {
+  id           String       @id @default(uuid())
+  leaseId      String
+  agencyId     String
+  reviewerRole ReviewerRole
+  rating       Int
+  comment      String?
+  isPublic     Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  lease        Lease        @relation(fields: [leaseId], references: [id])
+
+  @@unique([leaseId, reviewerRole])
+  @@index([leaseId])
+  @@map("lease_reviews")
+}
+
+enum ReviewerRole {
+  TENANT
+  AGENCY
 }
 
 enum TenantStatus {
